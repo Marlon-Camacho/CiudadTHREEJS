@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciudad</title>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://unpkg.com/three@0.85.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js" integrity="sha512-LF8ZB1iTwi4Qvkm4pekHG4a437Y9Af5ZuwbnW4GTbAWQeR2E4KW8WF+xH8b9psevV7wIlDMx1MH9YfPqgKhA/Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    
+
+    <script>
+
+    var scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x716161);
+    scene.fog = new THREE.Fog(0xffffff, 70, 3);
+
+    var camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth/window.innerHeight
+    );
+
+    camera.position.z=50;
+    camera.rotation.x=-8;
+    camera.position.y=40;
+
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    renderer.shadowMapEnabled=true;
+
+    //formas
+
+    var planeGeometry = new THREE.PlaneGeometry(100, 100, 1, 1);
+    var planeMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
+    var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    plane.receiveShadow=true;
+    plane.rotation.x=-0.5 * Math.PI;
+    //plane.position.y=0;
+
+    //var geometry = new THREE.BoxGeometry(1,1,1);
+    //var material = new THREE.MeshBasicMaterial({color: 003300});
+    //var cube = new THREE.Mesh(geometry, material);
+
+    //controls
+
+    var controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.update();
+    
+    var _controls = new (function () {
+        this.addBuilding = function () {
+        var Altura = 20 + Math.random()*20;
+
+        var letras = ["a", "b", "c", "d", "e", "f", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+        
+
+        var colorBase = "";
+        for (var i = 0; i < 6; i++) {
+            var numero = (Math.random() * 15).toFixed(0);
+            colorBase = colorBase+letras[numero];
+        }
+
+        var colorEdificio = '#'+colorBase;
+
+        //console.log(colorEdificio);
+
+        const cube= new THREE.Mesh(new THREE.BoxGeometry(5, Altura, 5), new THREE.MeshPhongMaterial({color:colorEdificio}));
+
+        
+        cube.castShadow=true;
+        cube.position.x = Math.random()*(45+45)-45; 
+        cube.position.z = Math.random()*(45+45)-45;
+        cube.position.y = Altura/2;
+
+        scene.add(cube);
+
+        };
+    })
+       
+   
+    var gui = new dat.GUI();
+    gui.add(_controls, 'addBuilding');
+
+    //Luz
+    let light = new THREE.PointLight("white", 1, 100);
+    let sphere = new THREE.SphereGeometry(0.5, 16, 8);
+    
+    light.add(new THREE.Mesh(sphere,new THREE.MeshBasicMaterial({ color: "white" })));
+    light.position.set(40, 40, 10);
+    light.castShadow=true;
+
+    //adicion escena
+    scene.add(plane, light);
+
+    //animación
+    function animate(time) {
+        requestAnimationFrame(animate);
+        stats.update();
+        
+        renderer.render(scene, camera);
+    }
+
+    animate();
+        
+    </script>
+
+    <div>
+        <script>
+            var stats = new Stats();
+            stats.setMode(2); // 0: fps, 1: ms, 2memory
+            stats.domElement.style.position = "absolute";
+            stats.domElement.style.left = "100px";
+            stats.domElement.style.top = "10px";
+
+            document.body.appendChild(stats.domElement);
+        </script>
+    </div>
+
+
+</body>
+</html>
